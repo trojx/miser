@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">守财奴</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="allMaster">大师</string>
+    <string name="conversation">观点</string>
+    <string name="alarms">动态</string>
+    <string name="setting">设置</string>
+</resources>

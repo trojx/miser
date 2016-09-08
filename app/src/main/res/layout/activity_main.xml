@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:hyman="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.miser.li.miser.MainActivity">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/id_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+        </android.support.v4.view.ViewPager>
+
+    <LinearLayout
+        android:background="@drawable/tab_bg"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal">
+
+    <com.miser.li.miser.ChangeColorIconWithText
+        android:id="@+id/id_indicator_one"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:padding="5dp"
+        hyman:icon="@mipmap/ic_allmaster"
+        hyman:text="@string/allMaster"
+        hyman:text_size="12sp"
+        hyman:color="#ff45c01a" />
+
+    <com.miser.li.miser.ChangeColorIconWithText
+        android:id="@+id/id_indicator_two"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:padding="5dp"
+        hyman:icon="@mipmap/ic_conversation"
+        hyman:text="@string/conversation"
+        hyman:text_size="12sp"
+        hyman:color="#ff45c01a" />
+
+    <com.miser.li.miser.ChangeColorIconWithText
+        android:id="@+id/id_indicator_three"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:padding="5dp"
+        hyman:icon="@mipmap/ic_alarms"
+        hyman:text="@string/alarms"
+        hyman:text_size="12sp"
+        hyman:color="#ff45c01a" />
+
+    <com.miser.li.miser.ChangeColorIconWithText
+        android:id="@+id/id_indicator_four"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:padding="5dp"
+        hyman:icon="@mipmap/ic_setting"
+        hyman:text="@string/setting"
+        hyman:text_size="12sp"
+        hyman:color="#ff45c01a" />
+    </LinearLayout>
+</LinearLayout>
