@@ -1,21 +1,27 @@
 package com.miser.li.miser;
 
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.view.ViewConfiguration;
-import android.view.Window;
+import android.widget.ListView;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,21 +33,25 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 {
 
     private ViewPager mViewPager;
-    private List<Fragment> mTables = new ArrayList<Fragment>();
+    private List<Fragment> mTables = new ArrayList<>();
     private String[] mTitles = new String[]{
-            "1 fragment","2 fragment","3 fragment","4 fragment"};
+            "allmaster","conversation","alarms","setting"};
     private FragmentPagerAdapter mAdapter;
-    private List<ChangeColorIconWithText> mTabIndicators = new ArrayList<ChangeColorIconWithText>();
+    private List<ChangeColorIconWithText> mTabIndicators = new ArrayList<>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //mAlarmsListView = (ListView) findViewById(R.id.alarms_main_lv);//创建列表实例
         initView();
         initDatas();
         mViewPager.setAdapter(mAdapter);
         initEvent();
+
     }
     private void initEvent()
     {
@@ -52,14 +62,30 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
     private void initDatas()
     {
-        for ( String title:mTitles) {
-            TabFragment tabFragment = new TabFragment();
 
-            Bundle bundle = new Bundle();
-            bundle.putString(tabFragment.TITLE, title);
-            tabFragment.setArguments(bundle);
-            mTables.add(tabFragment);
-        }
+        MasterFragment masterFragment = new MasterFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(masterFragment.TITLE, mTitles[0]);
+        masterFragment.setArguments(bundle);
+        mTables.add(masterFragment);
+
+        ConversationFragment conversationFragment = new ConversationFragment();
+        Bundle bundle1 = new Bundle();
+        bundle1.putString(conversationFragment.TITLE, mTitles[1]);
+        conversationFragment.setArguments(bundle1);
+        mTables.add(conversationFragment);
+
+        AlarmsFragment alarmsFragment = new AlarmsFragment();
+        Bundle bundle2 = new Bundle();
+        bundle2.putString(alarmsFragment.TITLE, mTitles[2]);
+        alarmsFragment.setArguments(bundle2);
+        mTables.add(alarmsFragment);
+
+        SettingFragment settingFragment = new SettingFragment();
+        Bundle bundle3 = new Bundle();
+        bundle3.putString(settingFragment.TITLE, mTitles[3]);
+        settingFragment.setArguments(bundle3);
+        mTables.add(settingFragment);
         mAdapter = new FragmentPagerAdapter(getSupportFragmentManager())
         {
 
@@ -225,4 +251,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         // TODO Auto-generated method stub
 
     }
+
+
+
 }
