@@ -1,6 +1,7 @@
 package com.miser.li.miser;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.miser.li.miser.AlarmsBean;
 import com.miser.li.miser.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +24,22 @@ public class AlarmsAdapter extends BaseAdapter {
     private List<AlarmsBean> mAlarmsBeanList;
     private LayoutInflater mInflater;
 
+
+    public void addItem(List<AlarmsBean> abl)
+    {
+        //Log.d("errrr","in");
+        if (!abl.isEmpty()) {
+            mAlarmsBeanList.addAll(abl);
+            if (mAlarmsBeanList.size() > 100)//最多显示100条
+                return;
+            notifyDataSetChanged();
+        }
+    }
+    public AlarmsAdapter(Context context)
+    {
+        mAlarmsBeanList = new ArrayList<>();
+        mInflater = LayoutInflater.from(context);
+    }
 
     public AlarmsAdapter(Context context, List<AlarmsBean> data)
     {

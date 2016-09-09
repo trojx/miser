@@ -3,6 +3,9 @@ package com.miser.li.miser;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
@@ -38,18 +41,11 @@ public class AlarmsFragment extends Fragment {
 
     public static final String TITLE = "title";
 
-    private static String URL = "http://www.imooc.com/api/teacher?type=4&num=30";
+    private static String URL = "http://www.imooc.com/api/teacher?type=4&num=1";
     private ListView mAlarmsListView;//买卖动态列表
-    private AlarmsAdapter malarmsAdapter;
+    private AlarmsAdapter malarmsAdapter;//数据适配器
 
-    private List<String> getData(){
-        List<String> data = new ArrayList<String>();
-        for(int i = 0;i < 2;i++) {
-            data.add(i+"");
-        }
-        return data;
-
-    }
+    private List<AlarmsBean> mAlarmsBeanList = new ArrayList<AlarmsBean>();//保存获取到的数据
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,25 +57,36 @@ public class AlarmsFragment extends Fragment {
         }
 
 
-
+        //获取视图实例
         View view= inflater.inflate(R.layout.alarms_main , container, false);
         mAlarmsListView = (ListView)view.findViewById(R.id.alarms_main_lv);
+        //创建数据适配器
+        malarmsAdapter = new AlarmsAdapter(getActivity(), mAlarmsBeanList);
+        mAlarmsListView.setAdapter(malarmsAdapter);
 
         new AlarmsAsyncTask().execute(URL);
+
+
         return view;
     }
+    //有新数据更新界面
+    private void UpdateUIFunction(List<AlarmsBean> alarmsBeenList)
+    {
+        malarmsAdapter.addItem(alarmsBeenList);
+    }
 
-
-
-    public  class AlarmsAsyncTask extends AsyncTask<String,Void,List<AlarmsBean>>
+    public  class AlarmsAsyncTask extends AsyncTask<String,Integer,List<AlarmsBean>>
+        //启动任务执行的输入参数”、“后台任务执行的进度”、“后台计算结果的类型”
     {
 
+        List<AlarmsBean> malarmsBeenList = new ArrayList<AlarmsBean>();;
         private List<AlarmsBean> getJsonData(String url)
         {
-            List<AlarmsBean> alarmsBeenList = new ArrayList<>();
+
+            List<AlarmsBean> alarmsBeenList = new ArrayList<AlarmsBean>();
             try {
                 String jsonString = readStream(new URL(url).openStream());
-                Log.d("alarms", jsonString);
+                //Log.d("alarms", jsonString);
                 JSONObject jsonObject;
                 AlarmsBean alarmsBean;
 
@@ -125,12 +132,32 @@ public class AlarmsFragment extends Fragment {
             return result;
         }
         @Override
-        protected List<AlarmsBean> doInBackground(String... params) {
-            return getJsonData(params[0]);
-        }
+        protected List<AlarmsBean> doInBackground(String... params) {//后台执行
 
+            while (true)
+            {
+                //List<AlarmsBean> alarmsBeenList = new ArrayList<AlarmsBean>();
+                malarmsBeenList = getJsonData(params[0]);
+                if (!malarmsBeenList.isEmpty()) {
+                    publishProgress(1);
+
+
+                }
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         @Override
-        protected void onPostExecute(List<AlarmsBean> alarmsBeen) {
+        protected void onProgressUpdate(Integer... p)
+        {
+            malarmsAdapter.addItem(malarmsBeenList);
+            //malarmsAdapter.notifyDataSetChanged();
+        }
+        @Override
+        protected void onPostExecute(List<AlarmsBean> alarmsBeen) {//doInBackground结束后执行该函数
             super.onPostExecute(alarmsBeen);
            AlarmsAdapter adapter = new AlarmsAdapter(getActivity(), alarmsBeen);
             mAlarmsListView.setAdapter(adapter);
