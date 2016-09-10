@@ -29,7 +29,7 @@ public class AlarmsAdapter extends BaseAdapter {
     {
         //Log.d("errrr","in");
         if (!abl.isEmpty()) {
-            mAlarmsBeanList.addAll(abl);
+            mAlarmsBeanList= abl;
             if (mAlarmsBeanList.size() > 100)//最多显示100条
                 return;
             notifyDataSetChanged();

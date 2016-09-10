@@ -29,9 +29,7 @@ public class ConversationAdapter extends BaseAdapter{
     {
         //Log.d("errrr","in");
         if (!abl.isEmpty()) {
-            mMsgList.addAll(abl);
-            if (mMsgList.size() > 100)//最多显示100条
-                return;
+            mMsgList= abl;
             notifyDataSetChanged();
         }
     }

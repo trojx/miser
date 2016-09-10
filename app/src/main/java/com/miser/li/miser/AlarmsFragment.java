@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -91,6 +94,8 @@ public class AlarmsFragment extends Fragment {
 
     private String mcookstr;//保存cookies
     static int NotificationCount = 0;
+
+    private UIAlarmsReceiver mUIAlarmsRecevier;
     private  void Notification(String Title, String Content)//发送通知栏消息
     {
 
@@ -157,7 +162,10 @@ public class AlarmsFragment extends Fragment {
         //new AlarmsAsyncTask().execute(URL);
 
 
-
+        mUIAlarmsRecevier = new UIAlarmsReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.miser.li.miser.ALARMS");
+        getActivity().registerReceiver(mUIAlarmsRecevier, filter);//(CONVERSATION_CHANGED_ACTION));
         return view;
     }
 
@@ -211,6 +219,57 @@ public class AlarmsFragment extends Fragment {
         reqBuilder.addHeader("Referer","http://t.10jqka.com.cn/circle/8530");
         reqBuilder.addHeader("User-Agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36");
         reqBuilder.addHeader("X-Requested-With","XMLHttpRequest");
+    }
+
+
+    public Boolean isHaveNew(List<AlarmsBean> Old, List<AlarmsBean> New)
+    {
+        Boolean ret = false;
+        Boolean bExist = false;
+        int sizeOfNew = New.size();
+        int sizeOfOld = Old.size();
+        for (int i = 0; i < sizeOfNew; i++)
+        {
+            bExist = false;
+            AlarmsBean N = New.get(i);
+            for (int j = 0; j < sizeOfOld; j++)
+            {
+                if (N.equals(Old.get(j)))
+                {
+                    bExist = true;
+                    break;
+                }
+            }
+            if (!bExist)
+            {//有新元素
+                ret = true;
+                Notification(N.masterName, N.type + " " + N.sharesname + " " + N.wdjg);
+            }
+
+        }
+        return ret;
+    }
+    //内部类接受广播 方便更新界面
+    public class UIAlarmsReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            String action = intent.getAction();
+            if(action.equals("com.miser.li.miser.ALARMS"))//(MainActivity.CONVERSATION_CHANGED_ACTION))
+            {
+                Bundle bundle = intent.getExtras();
+                List<AlarmsBean> ABeanList;// = new ArrayList<ConvertsationBean>();
+
+                ArrayList list = bundle.getParcelableArrayList("list");
+                ABeanList = (List<AlarmsBean>) list.get(0);
+                if (isHaveNew(mAlarmsBeanList, ABeanList)) {
+                    mAlarmsBeanList.addAll(ABeanList);
+                    malarmsAdapter.addItem(mAlarmsBeanList);
+                }
+            }
+        }
+
     }
     //内部类 异步执行网络任务
     public  class AlarmsAsyncTask extends AsyncTask<String,Integer,List<AlarmsBean>>

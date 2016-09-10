@@ -1,5 +1,8 @@
 package com.miser.li.miser;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -32,6 +35,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         OnPageChangeListener
 {
 
+    public static ConversationFragment cf;
     private ViewPager mViewPager;
     private List<Fragment> mTables = new ArrayList<>();
     private String[] mTitles = new String[]{
@@ -51,6 +55,32 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         initDatas();
         mViewPager.setAdapter(mAdapter);
         initEvent();
+
+
+
+
+
+        //registerReceiver(mAlarmsReceiver, new IntentFilter(ALARMS_CHANGED_ACTION));
+        //Bundle bundle = new Bundle();
+        //bundle.putString("param", "oper1");
+        //startServiceIntent.putExtras(bundle);
+
+        try{
+            //Intent startServiceIntent = new Intent("com.miser.li.miser.IntentServiceHttp");
+            //startService(startServiceIntent);
+            Intent it3 = new Intent("com.miser.li.miser.IntentServiceHttp");
+          //  Bundle b3 = new Bundle();
+         //   b3.putString("param", "s3");
+          //  it3.putExtras(b3);
+
+            //接着启动多次IntentService,每次启动,都会新建一个工作线程
+            //但始终只有一个IntentService实例
+            ComponentName b = startService(it3);
+
+            Log.d("8033", "try to start service:");
+        } catch(Exception e){
+            Log.d("8033", e.toString());
+        }
 
         //启屏初始设置为显示第三页
         //resetOtherTabs();
@@ -77,6 +107,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         Bundle bundle1 = new Bundle();
         bundle1.putString(conversationFragment.TITLE, mTitles[1]);
         conversationFragment.setArguments(bundle1);
+        cf = conversationFragment;
         mTables.add(conversationFragment);
 
         AlarmsFragment alarmsFragment = new AlarmsFragment();

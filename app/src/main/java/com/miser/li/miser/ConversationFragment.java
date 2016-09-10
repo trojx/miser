@@ -1,5 +1,9 @@
 package com.miser.li.miser;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -51,12 +55,18 @@ public class ConversationFragment extends Fragment {
 
 
     private ListView mMsgListView;//消息显示列表
-    private ConversationAdapter mMsgAdapter;//数据适配器
+    public ConversationAdapter mMsgAdapter;//数据适配器
 
     private List<ConvertsationBean> mMsgBeanList = new ArrayList<ConvertsationBean>();//保存获取到的数据
     private String mcookstr;//保存cookies
     private static String URL = "http://zhangtingx.top:888/getChatList/?pid=";
     private Logger gLogger;
+    private UIConversationReceiver mConReceiver;
+    public void ui(List<ConvertsationBean> L)
+    {
+        mMsgBeanList.addAll(L);
+        mMsgAdapter.addItem(mMsgBeanList);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -70,7 +80,13 @@ public class ConversationFragment extends Fragment {
 
         mcookstr = readFileSdcardFile("/mnt/sdcard/miser.cook");
         gLogger = Logger.getLogger("miser");
-        new ConversationFragment.MsgAsyncTask().execute(URL);
+        //new ConversationFragment.MsgAsyncTask().execute(URL);
+
+        mConReceiver = new UIConversationReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.miser.li.miser.CONVERSATION");
+       getActivity().registerReceiver(mConReceiver, filter);//(CONVERSATION_CHANGED_ACTION));
+
         return view;
     }
 
@@ -96,6 +112,26 @@ public class ConversationFragment extends Fragment {
     }
 
 
+    //内部类接受广播 方便更新界面
+    public class UIConversationReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            String action = intent.getAction();
+            if(action.equals("com.miser.li.miser.CONVERSATION"))//(MainActivity.CONVERSATION_CHANGED_ACTION))
+            {
+                Bundle bundle = intent.getExtras();
+                List<ConvertsationBean> MsgBeanList;// = new ArrayList<ConvertsationBean>();
+
+                ArrayList list = bundle.getParcelableArrayList("list");
+                MsgBeanList = (List<ConvertsationBean>) list.get(0);
+
+                mMsgAdapter.addItem(MsgBeanList);
+            }
+        }
+
+    }
     //内部类 异步执行网络任务
     public  class MsgAsyncTask extends AsyncTask<String,Integer,List<ConvertsationBean>>
             //启动任务执行的输入参数”、“后台任务执行的进度”、“后台计算结果的类型”
