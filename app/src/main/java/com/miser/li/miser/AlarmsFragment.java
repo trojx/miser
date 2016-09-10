@@ -106,7 +106,8 @@ public class AlarmsFragment extends Fragment {
         //通知内容
         mBuilder.setContentText(Content);
         //mBuilder.setDefaults(Notification.DEFAULT_ALL);
-       // mBuilder.setDefaults(Notification.DEFAULT_SOUND);//设置声音
+       //mBuilder.setDefaults(Notification.DEFAULT_SOUND);//设置声音
+        mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
         mBuilder.setDefaults(Notification.DEFAULT_LIGHTS);//设置指示灯，，，，，指示灯个震动都需要配置权限
         mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);//设置震动效果
         //设置大图标，即通知条上左侧的图片（如果只设置了小图标，则此处会显示小图标）
@@ -115,7 +116,7 @@ public class AlarmsFragment extends Fragment {
         mBuilder.setNumber(6);
 
         //设置为不可清除模式
-        mBuilder.setOngoing(true);
+       /* mBuilder.setOngoing(true);
         //播放闹铃声
         Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         MediaPlayer player = new MediaPlayer();
@@ -130,7 +131,7 @@ public class AlarmsFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        player.start();
+        player.start();*/
 
         //显示通知，id必须不重复，否则新的通知会覆盖旧的通知（利用这一特性，可以对通知进行更新）
         mNotificationManager.notify(NotificationCount++, mBuilder.build());
@@ -259,7 +260,7 @@ public class AlarmsFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            return true;
+            return false;
 
         }
         private List<AlarmsBean> getJsonData(String url)//获取数据
@@ -301,6 +302,7 @@ public class AlarmsFragment extends Fragment {
                             {
                                 alarmsBean.type = "卖";
                             }
+                            //查询是否为消息
                             Boolean bExist = false;
                             for (AlarmsBean exist: mAlarmsBeenList)
                             {

@@ -52,6 +52,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         mViewPager.setAdapter(mAdapter);
         initEvent();
 
+        //启屏初始设置为显示第三页
+        resetOtherTabs();
+        mTabIndicators.get(2).setIconAlpha(1.0f);
+        mViewPager.setCurrentItem(2, false);
     }
     private void initEvent()
     {

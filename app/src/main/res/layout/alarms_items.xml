@@ -19,8 +19,9 @@
             android:id="@+id/al_mastername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
+
             android:maxLines="1"
+            android:textSize="25px"
             android:text="mastername"/>
 
         <TextView
@@ -29,6 +30,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="3dp"
             android:maxLines="1"
+            android:textSize="40px"
             android:text="sharesname"/>
 
         <LinearLayout
@@ -37,31 +39,41 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:background="@drawable/textview_greystyle"
                 android:id="@+id/al_time"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingRight="10dp"
+                android:gravity="center"
+                android:paddingRight="6dp"
+                android:paddingLeft="6dp"
                 android:maxLines="1"
                 android:text="time"/>
             <TextView
                 android:id="@+id/al_jg"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingRight="10dp"
+                android:gravity="center"
+                android:paddingRight="6dp"
+                android:paddingLeft="6dp"
                 android:maxLines="1"
                 android:text="jg"/>
             <TextView
+                android:background="@drawable/textview_redstyle"
                 android:id="@+id/al_type"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingRight="10dp"
+                android:gravity="center"
+                android:paddingRight="6dp"
+                android:paddingLeft="6dp"
                 android:maxLines="1"
                 android:text="type"/>
             <TextView
                 android:id="@+id/al_number"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingRight="10dp"
+                android:gravity="center"
+                android:paddingRight="6dp"
+                android:paddingLeft="6dp"
                 android:maxLines="1"
                 android:text="number"/>
         </LinearLayout>
