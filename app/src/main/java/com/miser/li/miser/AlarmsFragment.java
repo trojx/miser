@@ -1,7 +1,15 @@
 package com.miser.li.miser;
 
+import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -68,7 +76,7 @@ public class AlarmsFragment extends Fragment {
         logConfigurator.configure();
 
         //gLogger = Logger.getLogger(this.getClass());
-        gLogger = Logger.getLogger("CrifanLiLog4jTest");
+        gLogger = Logger.getLogger("miser");
     }
 
     private String mTitle = "Default";
@@ -81,7 +89,52 @@ public class AlarmsFragment extends Fragment {
 
     private List<AlarmsBean> mAlarmsBeanList = new ArrayList<AlarmsBean>();//保存获取到的数据
 
-    private String mcookstr;
+    private String mcookstr;//保存cookies
+    static int NotificationCount = 0;
+    private  void Notification(String Title, String Content)//发送通知栏消息
+    {
+
+        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        android.support.v4.app.NotificationCompat.Builder mBuilder = new android.support.v4.app.NotificationCompat.Builder(getContext());
+        //系统收到通知时，通知栏上面显示的文字。
+        mBuilder.setTicker(Content);
+        //显示在通知栏上的小图标
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        //通知标题
+        mBuilder.setContentTitle(Title);
+        //通知内容
+        mBuilder.setContentText(Content);
+        //mBuilder.setDefaults(Notification.DEFAULT_ALL);
+       // mBuilder.setDefaults(Notification.DEFAULT_SOUND);//设置声音
+        mBuilder.setDefaults(Notification.DEFAULT_LIGHTS);//设置指示灯，，，，，指示灯个震动都需要配置权限
+        mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);//设置震动效果
+        //设置大图标，即通知条上左侧的图片（如果只设置了小图标，则此处会显示小图标）
+        //mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.share_sina));
+        //显示在小图标左侧的数字
+        mBuilder.setNumber(6);
+
+        //设置为不可清除模式
+        mBuilder.setOngoing(true);
+        //播放闹铃声
+        Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        MediaPlayer player = new MediaPlayer();
+        try {
+            player.setDataSource(getContext(), alert);
+            AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+                player.setAudioStreamType(AudioManager.STREAM_ALARM);
+                player.prepare();
+            }
+                player.setLooping(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        player.start();
+
+        //显示通知，id必须不重复，否则新的通知会覆盖旧的通知（利用这一特性，可以对通知进行更新）
+        mNotificationManager.notify(NotificationCount++, mBuilder.build());
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -90,7 +143,6 @@ public class AlarmsFragment extends Fragment {
             mTitle = getArguments().getString(TITLE);
 
         }
-
         configLog();
         gLogger.debug("test log");
         //获取视图实例
@@ -207,7 +259,7 @@ public class AlarmsFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            return false;
+            return true;
 
         }
         private List<AlarmsBean> getJsonData(String url)//获取数据
@@ -261,6 +313,7 @@ public class AlarmsFragment extends Fragment {
                             {
                                 mAlarmsBeenList.add(alarmsBean);
                                 mNewAlarmsBeenList.add(alarmsBean);
+                                Notification(alarmsBean.masterName, alarmsBean.type + " " + alarmsBean.sharesname + " " + alarmsBean.wdjg);
                             }
                         }
                     }
