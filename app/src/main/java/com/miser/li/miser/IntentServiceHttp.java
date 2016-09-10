@@ -160,6 +160,7 @@ public class IntentServiceHttp extends IntentService {
         }
         return res;
     }
+    /*
     private Boolean hasJsonData()//先判断是否有新数据
     {
 
@@ -197,7 +198,7 @@ public class IntentServiceHttp extends IntentService {
 
         return true;
 
-    }
+    }*/
     private void getAlarmsAndSendIntent() throws InterruptedException {
         ENTRUSTURL += String.valueOf(System.currentTimeMillis());
         try {

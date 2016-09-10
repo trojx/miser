@@ -29,7 +29,7 @@ public class ConversationAdapter extends BaseAdapter{
     {
         //Log.d("errrr","in");
         if (!abl.isEmpty()) {
-            mMsgList= abl;
+            mMsgList.addAll(abl);
             notifyDataSetChanged();
         }
     }
