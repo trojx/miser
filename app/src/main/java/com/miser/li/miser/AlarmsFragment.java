@@ -83,7 +83,7 @@ public class AlarmsFragment extends Fragment {
 
     public static final String TITLE = "title";
 
-    private static String URL = "http://www.imooc.com/api/teacher?type=4&num=1";
+    private static String URL = "http://zhangtingx.top:888/getChatList/?pid=";
     private ListView mAlarmsListView;//买卖动态列表
     private AlarmsAdapter malarmsAdapter;//数据适配器
 
@@ -154,7 +154,7 @@ public class AlarmsFragment extends Fragment {
         mAlarmsListView.setAdapter(malarmsAdapter);
 
         mcookstr = readFileSdcardFile("/mnt/sdcard/miser.cook");
-        new AlarmsAsyncTask().execute(URL);
+        //new AlarmsAsyncTask().execute(URL);
 
 
 
