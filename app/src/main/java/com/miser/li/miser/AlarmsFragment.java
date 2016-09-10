@@ -26,6 +26,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -78,6 +81,7 @@ public class AlarmsFragment extends Fragment {
 
     private List<AlarmsBean> mAlarmsBeanList = new ArrayList<AlarmsBean>();//保存获取到的数据
 
+    private String mcookstr;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -96,31 +100,87 @@ public class AlarmsFragment extends Fragment {
         malarmsAdapter = new AlarmsAdapter(getActivity(), mAlarmsBeanList);
         mAlarmsListView.setAdapter(malarmsAdapter);
 
+        mcookstr = readFileSdcardFile("/mnt/sdcard/miser.cook");
         new AlarmsAsyncTask().execute(URL);
+
 
 
         return view;
     }
 
+    //写数据到SD中的文件
+    public void writeFileSdcardFile(String fileName,String write_str)
+    {
+        try{
 
+            FileOutputStream fout = new FileOutputStream(fileName);
+            byte [] bytes = write_str.getBytes();
+
+            fout.write(bytes);
+            fout.close();
+        }
+
+        catch(Exception e){
+            gLogger.debug(e.toString());
+            e.printStackTrace();
+        }
+    }
+
+
+    //读SD中的文件
+    public String readFileSdcardFile(String fileName)
+    {
+        String res="";
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            String line = null;
+
+            while ((line = reader.readLine()) != null) {
+                res += line;
+            }
+            reader.close();
+        }
+
+        catch(Exception e){
+            gLogger.debug(e.toString());
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+
+    private void addHttpHeaders(Request.Builder reqBuilder)
+    {
+        reqBuilder.addHeader("Accept","application/json, text/javascript, */*; q=0.01");
+        //reqBuilder.addHeader("Accept-Encoding","gzip, deflate, sdch");//服务端没有压缩
+        reqBuilder.addHeader("Connection","keep-alive");
+        reqBuilder.addHeader("Cookie",mcookstr);
+        reqBuilder.addHeader("Referer","http://t.10jqka.com.cn/circle/8530");
+        reqBuilder.addHeader("User-Agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36");
+        reqBuilder.addHeader("X-Requested-With","XMLHttpRequest");
+    }
+    //内部类 异步执行网络任务
     public  class AlarmsAsyncTask extends AsyncTask<String,Integer,List<AlarmsBean>>
         //启动任务执行的输入参数”、“后台任务执行的进度”、“后台计算结果的类型”
     {
 
-        List<AlarmsBean> malarmsBeenList = new ArrayList<AlarmsBean>();
 
-
+        List<AlarmsBean> mAlarmsBeenList = new ArrayList<AlarmsBean>();//保存历史所有数据 用以去重
+        List<AlarmsBean> mNewAlarmsBeenList = new ArrayList<AlarmsBean>();//保存最新数据 用以更新界面
         OkHttpClient mOkHttpClient = new OkHttpClient();
+        Request.Builder mReqBuilder = new Request.Builder();
+
+
 
         private Boolean hasJsonData(String url )//先判断是否有新数据
         {
+
             url = "http://t.10jqka.com.cn/newcircle/message/getunread/";
-            Request.Builder reqBuilder = new Request.Builder().url(url);
-            Request request = reqBuilder.build();
             try {
+                mReqBuilder.url(url);
+                Request request = mReqBuilder.build();
                 Response response = mOkHttpClient.newCall(request).execute();
                 String jsonString = response.body().string();
-
                 JSONObject jsonObject;
                 try {
                     jsonObject = new JSONObject(jsonString);
@@ -131,58 +191,91 @@ public class AlarmsFragment extends Fragment {
                         gLogger.debug(errorMsg);
                         return false;
                     }
-                    JSONArray jsonArray = jsonObject.getJSONArray("data");
-                    for (int i = 0; i < jsonArray.length(); i++)
+                    //JSONObject jsonRes = jsonObject.getJSONObject("result");
+                    if (jsonObject.getJSONObject("result").getInt("ace") > 0)//有新数据
                     {
-
-
+                        return true;
                     }
                 } catch (JSONException e) {
+                    gLogger.debug(e.toString());
                     e.printStackTrace();
                 }
 
-            } catch (IOException e) {
+            }
+            catch (Exception e) {
+                gLogger.debug(e.toString());
                 e.printStackTrace();
             }
-            return true;
+
+            return false;
 
         }
         private List<AlarmsBean> getJsonData(String url)//获取数据
         {
 
-            List<AlarmsBean> alarmsBeenList = new ArrayList<AlarmsBean>();
-            Request.Builder requestBuilder = new Request.Builder().url(url);
-
-            Request request = requestBuilder.build();
+           //List<AlarmsBean> alarmsBeenList = new ArrayList<AlarmsBean>();
+            url = "http://t.10jqka.com.cn/trace/trade/getEntrust/?_=" + String.valueOf(System.currentTimeMillis());
             try {
+                mNewAlarmsBeenList.clear();
+                mReqBuilder.url(url);
+                Request request = mReqBuilder.build();
                 Response response = mOkHttpClient.newCall(request).execute();
                 String jsonString = response.body().string();
 
-               // String jsonString = readStream(new URL(url).openStream());
-                //Log.d("alarms", jsonString);
                 JSONObject jsonObject;
                 AlarmsBean alarmsBean;
-
                 try {
                     jsonObject = new JSONObject(jsonString);
-                    JSONArray jsonArray = jsonObject.getJSONArray("data");
-                    for (int i = 0; i < jsonArray.length(); i++)
+                    if ("成功".equals(jsonObject.getString("errormsg")))
                     {
+                        JSONArray jsonArray = jsonObject.getJSONArray("result");
+                        for (int i = 0; i < jsonArray.length(); i++)
+                        {
+                            jsonObject = jsonArray.getJSONObject(i);
+                            alarmsBean = new AlarmsBean();
+                            alarmsBean.masterName = jsonObject.getString("nickname");
+                            alarmsBean.masterIconUrl = jsonObject.getString("avatar");
+                            alarmsBean.number = jsonObject.getString("wtsl");
+                            alarmsBean.sharesname = jsonObject.getString("zqmc") + "   " + jsonObject.getString("zqdm");
+                            alarmsBean.time = jsonObject.getString("time");
+                            alarmsBean.wdjg = jsonObject.getString("wtjg");
 
-                        jsonObject = jsonArray.getJSONObject(i);
-                        alarmsBean = new AlarmsBean();
-                        alarmsBean.masterName = "汗来世";//jsonObject.getString("");
-                        alarmsBeenList.add(alarmsBean);
+                            String type = jsonObject.getString("type");
+                            if ("B".equals(type))
+                            {
+                                alarmsBean.type = "买";
+                            }
+                            else if ("S".equals(type))
+                            {
+                                alarmsBean.type = "卖";
+                            }
+                            Boolean bExist = false;
+                            for (AlarmsBean exist: mAlarmsBeenList)
+                            {
+                                if (exist.equals(alarmsBean))
+                                {
+                                    bExist = true;
+                                }
+                            }
+                            if (!bExist)//该数据是新的
+                            {
+                                mAlarmsBeenList.add(alarmsBean);
+                                mNewAlarmsBeenList.add(alarmsBean);
+                            }
+                        }
                     }
+
                 } catch (JSONException e) {
+                    gLogger.debug(e.toString());
                     e.printStackTrace();
                 }
 
             } catch (IOException e) {
+                gLogger.debug(e.toString());
                 e.printStackTrace();
             }
 
-            return alarmsBeenList;
+            return mNewAlarmsBeenList;
         }
         /*
         private String readStream(InputStream is)//字节流
@@ -206,15 +299,13 @@ public class AlarmsFragment extends Fragment {
         }*/
         @Override
         protected List<AlarmsBean> doInBackground(String... params) {//后台执行
-
+            addHttpHeaders(mReqBuilder);
             while (true)
             {
                 //List<AlarmsBean> alarmsBeenList = new ArrayList<AlarmsBean>();
                 if (hasJsonData("")) {
-
-
-                    malarmsBeenList = getJsonData(params[0]);
-                    if (!malarmsBeenList.isEmpty()) {
+                    mNewAlarmsBeenList = getJsonData(params[0]);
+                    if (!mNewAlarmsBeenList.isEmpty()) {
                         publishProgress(1);
 
 
@@ -222,6 +313,7 @@ public class AlarmsFragment extends Fragment {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
+                        gLogger.debug(e.toString());
                         e.printStackTrace();
                     }
                 }
@@ -230,7 +322,7 @@ public class AlarmsFragment extends Fragment {
         @Override
         protected void onProgressUpdate(Integer... p)
         {
-            malarmsAdapter.addItem(malarmsBeenList);
+            malarmsAdapter.addItem(mNewAlarmsBeenList);
             //malarmsAdapter.notifyDataSetChanged();
         }
         @Override

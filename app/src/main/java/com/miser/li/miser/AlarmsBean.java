@@ -11,4 +11,18 @@ public class AlarmsBean {
     public String wdjg;
     public String type;
     public String number;
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(!(obj instanceof AlarmsBean)){
+            return false;
+        }
+        AlarmsBean ab = (AlarmsBean) obj;
+
+        return (this.sharesname.equals(ab.sharesname)) &&
+                (this.type.equals(ab.type)) &&
+                 (this.masterName.equals(ab.masterName));
+
+    }
 }

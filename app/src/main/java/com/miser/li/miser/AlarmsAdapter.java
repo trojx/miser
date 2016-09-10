@@ -70,6 +70,11 @@ public class AlarmsAdapter extends BaseAdapter {
             view = mInflater.inflate(R.layout.alarms_items, null);
             viewHolder.ivIcon = (ImageView) view.findViewById(R.id.iv_icon);
             viewHolder.tvMastername = (TextView) view.findViewById(R.id.al_mastername);
+            viewHolder.tvSharesname = (TextView) view.findViewById(R.id.al_shaersname);
+            viewHolder.tvTime = (TextView) view.findViewById(R.id.al_time);
+            viewHolder.tvGdjg = (TextView) view.findViewById(R.id.al_jg);
+            viewHolder.tvType = (TextView) view.findViewById(R.id.al_type);
+            viewHolder.tvNumber = (TextView) view.findViewById(R.id.al_number);
             view.setTag(viewHolder);
         }
         else
@@ -78,6 +83,11 @@ public class AlarmsAdapter extends BaseAdapter {
         }
         viewHolder.ivIcon.setImageResource(R.mipmap.ic_launcher);
         viewHolder.tvMastername.setText(mAlarmsBeanList.get(i).masterName);
+        viewHolder.tvSharesname.setText(mAlarmsBeanList.get(i).sharesname);
+        viewHolder.tvTime.setText(mAlarmsBeanList.get(i).time);
+        viewHolder.tvGdjg.setText(mAlarmsBeanList.get(i).wdjg);
+        viewHolder.tvType.setText(mAlarmsBeanList.get(i).type);
+        viewHolder.tvNumber.setText(mAlarmsBeanList.get(i).number);;
         return view;
     }
 
