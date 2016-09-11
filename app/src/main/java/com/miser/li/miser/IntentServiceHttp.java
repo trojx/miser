@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,11 +45,14 @@ public class IntentServiceHttp extends IntentService {
     //private List<AlarmsBean> mNewAlarmsBeanList = new ArrayList<AlarmsBean>();
     private ArrayList mlist = new ArrayList();//消息广播传递参数不能为局部变量，可能被销毁
     private String mcookstr;//保存cookies
+    private Logger gLogger;
+
     public IntentServiceHttp() {
         //必须实现父类的构造方法
         super("IntentServiceHttp");
         mcookstr = readFileSdcardFile("/mnt/sdcard/miser.cook");
         addHttpHeaders(mReqBuilderA);
+        gLogger = Logger.getLogger("miser");
     }
 
     @Override
@@ -114,7 +119,7 @@ public class IntentServiceHttp extends IntentService {
             }
 
         } catch (Exception e) {
-            //gLogger.debug(e.toString());
+            gLogger.debug(e.toString());
             e.printStackTrace();
         }
         if (!mMsgBeanList.isEmpty()) {
@@ -155,11 +160,29 @@ public class IntentServiceHttp extends IntentService {
         }
 
         catch(Exception e){
-            //gLogger.debug(e.toString());
+            gLogger.debug(e.toString());
             e.printStackTrace();
         }
         return res;
     }
+    //写数据到SD中的文件
+    public void writeFileSdcardFile(String fileName,String write_str)
+    {
+        try{
+
+            FileOutputStream fout = new FileOutputStream(fileName);
+            byte [] bytes = write_str.getBytes();
+
+            fout.write(bytes);
+            fout.close();
+        }
+
+        catch(Exception e){
+            gLogger.debug(e.toString());
+            e.printStackTrace();
+        }
+    }
+
     /*
     private Boolean hasJsonData()//先判断是否有新数据
     {
@@ -250,14 +273,18 @@ public class IntentServiceHttp extends IntentService {
                         }
                     }
                 }
+                else
+                {
+                    gLogger.debug(jsonObject.getString("errormsg"));
+                }
 
             } catch (JSONException e) {
-                //gLogger.debug(e.toString());
+                gLogger.debug(e.toString());
                 e.printStackTrace();
             }
 
         } catch (IOException e) {
-            //gLogger.debug(e.toString());
+            gLogger.debug(e.toString());
             e.printStackTrace();
         }
 
